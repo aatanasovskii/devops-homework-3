@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    ports:
+      - "3000:3000"
+    volumes:
+      - gitea-data:/data
+    networks:
+      - devops-net
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    user: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - gitea
+    networks:
+      - devops-net
+
+  nexus:
+    image: sonatype/nexus3
+    container_name: nexus
+    ports:
+      - "8081:8081"
+    volumes:
+      - nexus-data:/nexus-data
+    networks:
+      - devops-net
+
+  backend:
+    build: ./backend
+    container_name: my-backend
+    ports:
+      - "4000:4000"
+    networks:
+      - devops-net
+
+  frontend:
+    build: ./frontend
+    container_name: my-frontend
+    ports:
+      - "3005:3000"        # Mapped to 3005 to avoid conflict with Gitea
+    depends_on:
+      - backend            # Wait for backend to start
+    networks:
+      - devops-net
+
+volumes:
+  gitea-data:
+  jenkins-data:
+  nexus-data:
+
+networks:
+  devops-net:
+    driver: bridge
