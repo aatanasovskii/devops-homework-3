@@ -27,13 +27,13 @@ pipeline {
                     echo '--- 1. Installing Backend Dependencies ---'
                     sh 'npm install'
 
-                    // There is no 'npm test' because the simple app has no tests yet.
-
                     echo '--- 2. Building Backend Docker Image ---'
-                    // We name it backend-<build_number>
                     sh "docker build -t backend:${BUILD_NUMBER} ."
 
-                    echo '--- 3. Packaging & Uploading Backend ---'
+                    echo '--- 3. Running Containerized Integration Tests ---'
+                    sh "docker run --rm backend:${BUILD_NUMBER} npm test"
+
+                    echo '--- 4. Packaging & Uploading Backend ---'
                     sh "tar -czf backend-${BUILD_NUMBER}.tar.gz index.js package.json Dockerfile"
 
                     sh """
@@ -54,7 +54,10 @@ pipeline {
                     echo '--- 2. Building Frontend Docker Image ---'
                     sh "docker build -t frontend:${BUILD_NUMBER} ."
 
-                    echo '--- 3. Packaging & Uploading Frontend ---'
+                    echo '--- 3. Running Containerized Integration Tests ---'
+                    sh "docker run --rm frontend:${BUILD_NUMBER} npm test"
+
+                    echo '--- 4. Packaging & Uploading Frontend ---'
                     sh "tar -czf frontend-${BUILD_NUMBER}.tar.gz index.js package.json Dockerfile"
 
                     sh """
@@ -68,7 +71,7 @@ pipeline {
 
     post {
         success {
-            echo "SUCCESS: Uploaded backend-${BUILD_NUMBER}.tar.gz and frontend-${BUILD_NUMBER}.tar.gz to Nexus!"
+            echo "SUCCESS: App built, tested inside containers, and uploaded to Nexus!"
         }
         failure {
             echo "Pipeline Failed."
