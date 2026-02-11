@@ -4,6 +4,8 @@ services:
   gitea:
     image: gitea/gitea:latest
     container_name: gitea
+    environment:
+      - GITEA__webhook__ALLOWED_HOST_LIST=*
     ports:
       - "3000:3000"
     volumes:

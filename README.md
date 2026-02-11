@@ -1,4 +1,4 @@
-## DevOps Homework 2 – Jenkins CI with Docker
+## DevOps Homework
 
 ## Overview
 This project demonstrates a simple CI pipeline using containerized services:
