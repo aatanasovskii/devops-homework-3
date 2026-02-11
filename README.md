@@ -8,6 +8,7 @@ This project demonstrates a simple CI pipeline using containerized services:
 
 All services are deployed using Docker Compose.
 
+
 ## Prerequisites
 - Docker
 - Docker Compose
