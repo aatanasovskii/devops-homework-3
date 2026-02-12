@@ -99,9 +99,9 @@ pipeline {
                     // We use sed to replace 'blue' with 'green' (or vice versa) in the Nginx config
                     // We do this by copying the config out, editing it, copying it back, and reloading
 
-                    sh "docker cp nginx:/etc/nginx/conf.d/default.conf ./default.conf"
-                    sh "sed -i 's/${CURRENT_ENV}/${TARGET_ENV}/g' default.conf"
-                    sh "docker cp ./default.conf nginx:/etc/nginx/conf.d/default.conf"
+                    sh """
+                        docker exec nginx sh -c "sed 's/${CURRENT_ENV}/${TARGET_ENV}/g' /etc/nginx/conf.d/default.conf > /tmp/nginx.conf.tmp && cat /tmp/nginx.conf.tmp > /etc/nginx/conf.d/default.conf"
+                    """
 
                     // Reload Nginx to apply changes without downtime
                     sh "docker exec nginx nginx -s reload"
