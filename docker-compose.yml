@@ -37,21 +37,51 @@ services:
     networks:
       - devops-net
 
-  backend:
+  # --- BLUE ENVIRONMENT (ACTIVE INITIALLY) ---
+  backend-blue:
     build: ./backend
-    container_name: my-backend
-    ports:
-      - "4000:4000"
+    container_name: backend-blue
     networks:
       - devops-net
 
-  frontend:
+  frontend-blue:
     build: ./frontend
-    container_name: my-frontend
-    ports:
-      - "3005:3000"        # Mapped to 3005 to avoid conflict with Gitea
+    container_name: frontend-blue
     depends_on:
-      - backend            # Wait for backend to start
+      - backend-blue
+    environment:
+      - BACKEND_URL=http://backend-blue:4000
+    networks:
+      - devops-net
+
+  # --- GREEN ENVIRONMENT (IDLE INITIALLY) ---
+  backend-green:
+    build: ./backend
+    container_name: backend-green
+    networks:
+      - devops-net
+
+  frontend-green:
+    build: ./frontend
+    container_name: frontend-green
+    depends_on:
+      - backend-green
+    environment:
+      - BACKEND_URL=http://backend-green:4000
+    networks:
+      - devops-net
+
+  # --- LOAD BALANCER ---
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"  # This is the main entry point for users
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend-blue
+      - frontend-green
     networks:
       - devops-net
 

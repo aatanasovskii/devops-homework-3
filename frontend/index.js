@@ -8,7 +8,8 @@ app.get('/', async (req, res) => {
         // HERE IS THE MAGIC:
         // We use the service name "backend" (defined in docker-compose)
         // Docker DNS resolves "http://backend" to the correct internal IP.
-        const response = await axios.get('http://backend:4000/api/data');
+        const backendUrl = process.env.BACKEND_URL || 'http://backend-blue:4000';
+        const response = await axios.get(`${backendUrl}/api/data`);
 
         const data = response.data;
 

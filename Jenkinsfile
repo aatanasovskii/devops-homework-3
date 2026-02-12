@@ -6,7 +6,6 @@ pipeline {
     }
 
     environment {
-        // Nexus Configuration
         NEXUS_URL = 'http://nexus:8081'
         NEXUS_REPO = 'my-raw-repo'
         NEXUS_CREDS = 'admin:admin123'
@@ -20,61 +19,96 @@ pipeline {
             }
         }
 
-        // --- BACKEND PIPELINE ---
-        stage('Process Backend') {
+        // --- NEW STAGE: IDENTIFY ACTIVE ENVIRONMENT ---
+        stage('Identify Environment') {
+            steps {
+                script {
+                    // Check Nginx config to see if 'blue' is currently active
+                    // We use docker exec to check the file inside the running Nginx container
+                    def isBlue = sh(script: "docker exec nginx grep 'server frontend-blue' /etc/nginx/conf.d/default.conf", returnStatus: true) == 0
+
+                    if (isBlue) {
+                        env.CURRENT_ENV = "blue"
+                        env.TARGET_ENV = "green"
+                        echo "🔵 CURRENT ENV is BLUE. Deploying to 🟢 GREEN."
+                    } else {
+                        env.CURRENT_ENV = "green"
+                        env.TARGET_ENV = "blue"
+                        echo "🟢 CURRENT ENV is GREEN. Deploying to 🔵 BLUE."
+                    }
+                }
+            }
+        }
+
+        stage('Build & Test Backend') {
             steps {
                 dir('backend') {
-                    echo '--- 1. Installing Backend Dependencies ---'
                     sh 'npm install'
-
-                    echo '--- 2. Building Backend Docker Image ---'
                     sh "docker build -t backend:${BUILD_NUMBER} ."
-
-                    echo '--- 3. Running Containerized Integration Tests ---'
+                    // Test locally first
                     sh "docker run --rm backend:${BUILD_NUMBER} npm test"
-
-                    echo '--- 4. Packaging & Uploading Backend ---'
-                    sh "tar -czf backend-${BUILD_NUMBER}.tar.gz index.js package.json Dockerfile"
-
-                    sh """
-                        curl -v -u ${NEXUS_CREDS} --upload-file backend-${BUILD_NUMBER}.tar.gz \
-                        ${NEXUS_URL}/repository/${NEXUS_REPO}/backend-${BUILD_NUMBER}.tar.gz
-                    """
                 }
             }
         }
 
-        // --- FRONTEND PIPELINE ---
-        stage('Process Frontend') {
+        stage('Build & Test Frontend') {
             steps {
                 dir('frontend') {
-                    echo '--- 1. Installing Frontend Dependencies ---'
                     sh 'npm install'
-
-                    echo '--- 2. Building Frontend Docker Image ---'
                     sh "docker build -t frontend:${BUILD_NUMBER} ."
-
-                    echo '--- 3. Running Containerized Integration Tests ---'
                     sh "docker run --rm frontend:${BUILD_NUMBER} npm test"
+                }
+            }
+        }
 
-                    echo '--- 4. Packaging & Uploading Frontend ---'
-                    sh "tar -czf frontend-${BUILD_NUMBER}.tar.gz index.js package.json Dockerfile"
+        // --- NEW STAGE: DEPLOY TO IDLE ENVIRONMENT ---
+        stage('Deploy to Target (Idle)') {
+            steps {
+                script {
+                    echo "Deploying to ${TARGET_ENV}..."
 
+                    // 1. Stop and Remove the old container of the Target env
+                    sh "docker stop backend-${TARGET_ENV} || true"
+                    sh "docker rm backend-${TARGET_ENV} || true"
+                    sh "docker stop frontend-${TARGET_ENV} || true"
+                    sh "docker rm frontend-${TARGET_ENV} || true"
+
+                    // 2. Run the NEW Backend
                     sh """
-                        curl -v -u ${NEXUS_CREDS} --upload-file frontend-${BUILD_NUMBER}.tar.gz \
-                        ${NEXUS_URL}/repository/${NEXUS_REPO}/frontend-${BUILD_NUMBER}.tar.gz
+                        docker run -d --name backend-${TARGET_ENV} \
+                        --network devops-net \
+                        backend:${BUILD_NUMBER}
+                    """
+
+                    // 3. Run the NEW Frontend
+                    sh """
+                        docker run -d --name frontend-${TARGET_ENV} \
+                        --network devops-net \
+                        frontend:${BUILD_NUMBER}
                     """
                 }
             }
         }
-    }
 
-    post {
-        success {
-            echo "SUCCESS: App built, tested inside containers, and uploaded to Nexus!"
-        }
-        failure {
-            echo "Pipeline Failed."
+        // --- NEW STAGE: SWITCH TRAFFIC ---
+        stage('Switch Traffic (Nginx)') {
+            steps {
+                script {
+                    echo "Switching traffic from ${CURRENT_ENV} to ${TARGET_ENV}..."
+
+                    // We use sed to replace 'blue' with 'green' (or vice versa) in the Nginx config
+                    // We do this by copying the config out, editing it, copying it back, and reloading
+
+                    sh "docker cp nginx:/etc/nginx/conf.d/default.conf ./default.conf"
+                    sh "sed -i 's/${CURRENT_ENV}/${TARGET_ENV}/g' default.conf"
+                    sh "docker cp ./default.conf nginx:/etc/nginx/conf.d/default.conf"
+
+                    // Reload Nginx to apply changes without downtime
+                    sh "docker exec nginx nginx -s reload"
+
+                    echo "🚀 SUCCESSFULLY SWITCHED TO ${TARGET_ENV}!"
+                }
+            }
         }
     }
 }
