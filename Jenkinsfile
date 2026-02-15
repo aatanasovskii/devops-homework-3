@@ -23,8 +23,7 @@ pipeline {
         stage('Identify Environment') {
             steps {
                 script {
-                    // Check Nginx config to see if 'blue' is currently active
-                    // We use docker exec to check the file inside the running Nginx container
+                    // Check Nginx config to see if 'blue' is currently active, using docker exec to check the file inside the running Nginx container
                     def isBlue = sh(script: "docker exec nginx grep 'server frontend-blue' /etc/nginx/conf.d/default.conf", returnStatus: true) == 0
 
                     if (isBlue) {
@@ -45,7 +44,6 @@ pipeline {
                 dir('backend') {
                     sh 'npm install'
                     sh "docker build -t backend:${BUILD_NUMBER} ."
-                    // Test locally first
                     sh "docker run --rm backend:${BUILD_NUMBER} npm test"
                 }
             }
@@ -96,9 +94,7 @@ pipeline {
                 script {
                     echo "Switching traffic from ${CURRENT_ENV} to ${TARGET_ENV}..."
 
-                    // We use sed to replace 'blue' with 'green' (or vice versa) in the Nginx config
-                    // We do this by copying the config out, editing it, copying it back, and reloading
-
+                    // We use sed to replace 'blue' with 'green' (or vice versa) in the Nginx config, doing this by copying the config out, editing it, copying it back, and reloading
                     sh """
                         docker exec nginx sh -c "sed 's/${CURRENT_ENV}/${TARGET_ENV}/g' /etc/nginx/conf.d/default.conf > /tmp/nginx.conf.tmp && cat /tmp/nginx.conf.tmp > /etc/nginx/conf.d/default.conf"
                     """
