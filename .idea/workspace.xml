@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80f8bca4-fcd8-43d3-bce1-d207a43564f1" name="Changes" comment="default.conf file">
+      <change afterPath="$PROJECT_DIR$/.github/workflows/dev.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.github/workflows/prod.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nginx/default.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx/default.conf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -97,7 +98,8 @@
       <workItem from="1769076312614" duration="2328000" />
       <workItem from="1770235432823" duration="4497000" />
       <workItem from="1770505209718" duration="12701000" />
-      <workItem from="1771143170127" duration="1531000" />
+      <workItem from="1771143170127" duration="3303000" />
+      <workItem from="1772436762994" duration="3813000" />
     </task>
     <task id="LOCAL-00001" summary="integration tests added">
       <option name="closed" value="true" />

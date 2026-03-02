@@ -1,0 +1,59 @@
+name: Production Pipeline
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install & Test Backend
+        working-directory: ./backend
+        run: |
+          npm install
+          npm test
+
+      - name: Install & Test Frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm test
+
+      - name: Login to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/backend:prod ./backend
+          docker push ghcr.io/${{ github.repository }}/backend:prod
+
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/frontend:prod ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend:prod
+
+  # Deployment (CD)
+  deploy-prod:
+    needs: build-and-push
+    runs-on: self-hosted
+    environment: production
+    steps:
+      - name: Deploy to Production Environment
+        run: |
+          echo "🚀 Одобрен деплојмент! Стартувам префрлање на PROD..."
+          # Тука можеш да ја ставиш логиката за Blue-Green
+          # или најосновното: docker compose pull && docker compose up -d

@@ -1,0 +1,58 @@
+name: Development Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install & Test Backend
+        working-directory: ./backend
+        run: |
+          npm install
+          npm test
+
+      - name: Install & Test Frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm test
+
+      - name: Login to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Backend Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/backend:dev ./backend
+          docker push ghcr.io/${{ github.repository }}/backend:dev
+
+      - name: Build and Push Frontend Image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/frontend:dev ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend:dev
+
+  # Deployment (CD)
+  deploy-dev:
+    needs: build-and-push
+    runs-on: self-hosted # Се извршува на твојот компјутер
+    steps:
+      - name: Deploy to Development Environment
+        run: |
+          echo "🚀 Стартувам деплојмент на DEV..."
+          docker compose pull
+          docker compose up -d
