@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80f8bca4-fcd8-43d3-bce1-d207a43564f1" name="Changes" comment="default.conf file">
+      <change afterPath="$PROJECT_DIR$/docker-compose.github.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.github/workflows/dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/dev.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.github/workflows/prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/prod.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
@@ -17,7 +18,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="production" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />

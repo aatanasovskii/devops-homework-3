@@ -62,5 +62,6 @@ jobs:
       - name: Deploy to Production Environment
         run: |
           echo "🚀 Одобрен деплојмент! Стартувам префрлање на PROD..."
-          # Тука можеш да ја ставиш логиката за Blue-Green
-          # или најосновното: docker compose pull && docker compose up -d
+          export IMAGE_TAG=prod
+          docker compose -f docker-compose.github.yml pull
+          docker compose -f docker-compose.github.yml up -d

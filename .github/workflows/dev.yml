@@ -53,7 +53,7 @@ jobs:
   # Deployment (CD)
   deploy-dev:
     needs: build-and-push
-    runs-on: self-hosted # Runs on my computer
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,5 +61,6 @@ jobs:
       - name: Deploy to Development Environment
         run: |
           echo "🚀 Стартувам деплојмент на DEV..."
-          docker compose pull
-          docker compose up -d
+          export IMAGE_TAG=dev
+          docker compose -f docker-compose.github.yml pull
+          docker compose -f docker-compose.github.yml up -d

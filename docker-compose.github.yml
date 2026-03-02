@@ -1,0 +1,22 @@
+services:
+  backend:
+    image: ghcr.io/aatanasovskii/devops-homework-3/backend:${IMAGE_TAG:-dev}
+    container_name: github-simple-backend
+    networks:
+      - github-simple-net
+
+  frontend:
+    image: ghcr.io/aatanasovskii/devops-homework-3/frontend:${IMAGE_TAG:-dev}
+    container_name: github-simple-frontend
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_URL=http://backend:4000
+    ports:
+      - "8085:3000"
+    networks:
+      - github-simple-net
+
+networks:
+  github-simple-net:
+    driver: bridge
