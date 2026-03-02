@@ -53,8 +53,11 @@ jobs:
   # Deployment (CD)
   deploy-dev:
     needs: build-and-push
-    runs-on: self-hosted # Се извршува на твојот компјутер
+    runs-on: self-hosted # Runs on my computer
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy to Development Environment
         run: |
           echo "🚀 Стартувам деплојмент на DEV..."
