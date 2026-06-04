@@ -107,8 +107,12 @@ pipeline {
                 script {
                     echo "Switching traffic from ${CURRENT_ENV} to ${TARGET_ENV}..."
 
-                    // Read current config FROM nginx container, replace env name, write back using tee (no rename, works on volume mounts)
-                    sh "docker exec nginx cat /etc/nginx/conf.d/default.conf | sed 's/${CURRENT_ENV}/${TARGET_ENV}/g' | docker exec -i nginx tee /etc/nginx/conf.d/default.conf > /dev/null"
+                    // Step 1: read current config from nginx container into a Jenkins temp file (read completes fully before write starts)
+                    sh "docker exec nginx cat /etc/nginx/conf.d/default.conf > /tmp/nginx_current.conf"
+                    // Step 2: modify the temp file on Jenkins (not volume-mounted, sed -i works fine)
+                    sh "sed -i 's/${CURRENT_ENV}/${TARGET_ENV}/g' /tmp/nginx_current.conf"
+                    // Step 3: write modified content back into nginx container using tee (writes to existing inode, no rename)
+                    sh "cat /tmp/nginx_current.conf | docker exec -i nginx tee /etc/nginx/conf.d/default.conf > /dev/null"
 
                     // Reload Nginx to apply changes without downtime
                     sh "docker exec nginx nginx -s reload"
