@@ -107,10 +107,10 @@ pipeline {
                 script {
                     echo "Switching traffic from ${CURRENT_ENV} to ${TARGET_ENV}..."
 
-                    // Step 1: sed writes to a temp file INSIDE the container (not volume-mounted, so no rename issue)
-                    sh "docker exec nginx sh -c \"sed 's/${CURRENT_ENV}/${TARGET_ENV}/g' /etc/nginx/conf.d/default.conf > /tmp/nginx.conf.tmp\""
-                    // Step 2: cat overwrites the volume-mounted config by writing to the existing file inode (no rename, works on mounts)
-                    sh "docker exec nginx sh -c \"cat /tmp/nginx.conf.tmp > /etc/nginx/conf.d/default.conf\""
+                    // Modify the nginx config in Jenkins workspace (sed -i works here, file is not volume-mounted)
+                    sh "sed -i 's/${CURRENT_ENV}/${TARGET_ENV}/g' nginx/default.conf"
+                    // Copy the modified config into the nginx container (docker cp handles volume mounts correctly, no rename issue)
+                    sh "docker cp nginx/default.conf nginx:/etc/nginx/conf.d/default.conf"
 
                     // Reload Nginx to apply changes without downtime
                     sh "docker exec nginx nginx -s reload"
