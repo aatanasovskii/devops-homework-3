@@ -114,8 +114,8 @@ pipeline {
                     // Step 3: write modified content back into nginx container using tee (writes to existing inode, no rename)
                     sh "cat /tmp/nginx_current.conf | docker exec -i nginx tee /etc/nginx/conf.d/default.conf > /dev/null"
 
-                    // Reload Nginx to apply changes without downtime
-                    sh "docker exec nginx nginx -s reload"
+                    // Restart nginx container so it reads the config fresh (avoids MacOS Docker bind mount pread timing issue)
+                    sh "docker restart nginx"
 
                     echo "🚀 SUCCESSFULLY SWITCHED TO ${TARGET_ENV}!"
                 }
