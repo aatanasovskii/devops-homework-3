@@ -71,14 +71,14 @@ pipeline {
                     sh "docker stop frontend-${TARGET_ENV} || true"
                     sh "docker rm frontend-${TARGET_ENV} || true"
 
-                    // 2. Run the NEW Backend
+                    // 2. Start the NEW Backend
                     sh """
                         docker run -d --name backend-${TARGET_ENV} \
                         --network devops-net \
                         backend:${BUILD_NUMBER}
                     """
 
-                    // 3. Run the NEW Frontend
+                    // 3. Start the NEW Frontend
                     sh """
                         docker run -d --name frontend-${TARGET_ENV} \
                         --network devops-net \

@@ -5,10 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="80f8bca4-fcd8-43d3-bce1-d207a43564f1" name="Changes" comment="default.conf file">
-      <change afterPath="$PROJECT_DIR$/docker-compose.github.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/dev.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/dev.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.github/workflows/prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/prod.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +47,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;production&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/andrej/WebstormProjects/FINKI/DevOps/simple-docker-app&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -86,7 +86,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.112" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-WS-243.26574.96" />
       </set>
     </attachedChunks>
   </component>
@@ -105,6 +105,9 @@
       <workItem from="1770505209718" duration="12701000" />
       <workItem from="1771143170127" duration="3303000" />
       <workItem from="1772436762994" duration="5576000" />
+      <workItem from="1772612047301" duration="5000" />
+      <workItem from="1780398449132" duration="626000" />
+      <workItem from="1780410946625" duration="28258000" />
     </task>
     <task id="LOCAL-00001" summary="integration tests added">
       <option name="closed" value="true" />

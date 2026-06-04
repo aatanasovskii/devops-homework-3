@@ -54,7 +54,7 @@ jobs:
   deploy-prod:
     needs: build-and-push
     runs-on: self-hosted
-    environment: production
+    environment: production # it waits for manual approval (Continuous Delivery)
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
