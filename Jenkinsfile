@@ -94,10 +94,8 @@ pipeline {
                 script {
                     echo "Switching traffic from ${CURRENT_ENV} to ${TARGET_ENV}..."
 
-                    // We use sed to replace 'blue' with 'green' (or vice versa) in the Nginx config, doing this by copying the config out, editing it, copying it back, and reloading
-                    sh """
-                        docker exec nginx sh -c "sed 's/${CURRENT_ENV}/${TARGET_ENV}/g' /etc/nginx/conf.d/default.conf > /tmp/nginx.conf.tmp && cat /tmp/nginx.conf.tmp > /etc/nginx/conf.d/default.conf"
-                    """
+                    // Use sed -i to edit the Nginx config in-place inside the container (avoids temp file redirect issues)
+                    sh "docker exec nginx sed -i 's/${CURRENT_ENV}/${TARGET_ENV}/g' /etc/nginx/conf.d/default.conf"
 
                     // Reload Nginx to apply changes without downtime
                     sh "docker exec nginx nginx -s reload"
