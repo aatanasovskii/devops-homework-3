@@ -91,12 +91,12 @@ pipeline {
         stage('Publish to Nexus') {
             steps {
                 dir('backend') {
-                    sh "tar -czf backend-${BUILD_NUMBER}.tar.gz ."
-                    sh "curl -u ${NEXUS_CREDS} --upload-file backend-${BUILD_NUMBER}.tar.gz ${NEXUS_URL}/repository/${NEXUS_REPO}/backend-${BUILD_NUMBER}.tar.gz"
+                    sh "tar -czf /tmp/backend-${BUILD_NUMBER}.tar.gz ."
+                    sh "curl -u ${NEXUS_CREDS} --upload-file /tmp/backend-${BUILD_NUMBER}.tar.gz ${NEXUS_URL}/repository/${NEXUS_REPO}/backend-${BUILD_NUMBER}.tar.gz"
                 }
                 dir('frontend') {
-                    sh "tar -czf frontend-${BUILD_NUMBER}.tar.gz ."
-                    sh "curl -u ${NEXUS_CREDS} --upload-file frontend-${BUILD_NUMBER}.tar.gz ${NEXUS_URL}/repository/${NEXUS_REPO}/frontend-${BUILD_NUMBER}.tar.gz"
+                    sh "tar -czf /tmp/frontend-${BUILD_NUMBER}.tar.gz ."
+                    sh "curl -u ${NEXUS_CREDS} --upload-file /tmp/frontend-${BUILD_NUMBER}.tar.gz ${NEXUS_URL}/repository/${NEXUS_REPO}/frontend-${BUILD_NUMBER}.tar.gz"
                 }
             }
         }
