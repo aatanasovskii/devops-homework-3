@@ -15,7 +15,7 @@ app.get('/', async (req, res) => {
         <h1>Frontend Application</h1>
         <hr>
         <div style="background: #f4f4f4; padding: 20px; display: inline-block; border-radius: 10px;">
-            <h3 style="color: blue;">Version 1!</h3>
+            <h3 style="color: blue;">Version 1 Active!</h3>
             <p><b>Message from Backend:</b> ${data.message}</p>
             <p><b>Service Status:</b> ${data.status}</p>
         </div>
